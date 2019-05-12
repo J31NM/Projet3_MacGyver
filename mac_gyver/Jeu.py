@@ -54,6 +54,28 @@ class Labyrinth:
             num_line += 1
 
 
+class Player:
+
+    """This class manage all the player attributes and functions."""
+
+    def __init__(self, icone, window):
+        self.icone = pygame.image.load("images/MacGyver.png").convert_alpha()
+        self.case_x = 0
+        self.case_y = 0
+        self.x = 0
+        self.y = 0
+
+class Keeper(Player):
+
+    """This descendant class manage only manage the keeper position in the maze. He may have be handled in the
+    Labyrinth class. However this option could permit to work on a game enhancement or an add-on.
+    The keeper may get an agressive behaviour. Or for a multiplayer project."""
+
+    def __init__(self, icone, window):
+        self.icone = pygame.image.load("images/Gardien.png").convert_alpha()
+        self.x = 700
+        self.y = 700
+
 """ Main loop containing the game code. It allows to run the game as long as the player doesn't quit. """
 
 continuer = 1
@@ -64,5 +86,9 @@ while continuer:
 
         """ this line calls the labyrinth class which generates the maze. """
         labyrinth = Labyrinth()
+        macgyver = Player("images/MacGyver.png", window)
+        keeper = Keeper("images/Gardien.png", window)
 
+        window.blit(macgyver.icone, (macgyver.x, macgyver.y))
+        window.blit(keeper.icone, (keeper.x, keeper.y))
         pygame.display.flip()
