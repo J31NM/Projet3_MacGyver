@@ -19,44 +19,72 @@ import pygame
 from pygame.locals import *
 
 from constants import *
+from random import randrange
 
-pygame.init()
-
-window = pygame.display.set_mode((window_side, window_side))
-
-pygame.display.set_caption("FREE MACGYVER")
 
 class Labyrinth:
 
-    """ This class manage all the non-player functions as generating the maze design and the items management """
+    """ This class manage all the non-player functions as generating the maze design and the items positions """
 
-    def __init__(self):
-        wall = pygame.image.load("images/mur.png").convert_alpha()
-        start = pygame.image.load("images/depart.png").convert_alpha()
-        ground = pygame.image.load("images/sol.png").convert_alpha()
+    def __init__(self, window):
+        wall = pygame.image.load("images/wall.png").convert_alpha()
+        start = pygame.image.load("images/start.png").convert_alpha()
+        ground = pygame.image.load("images/ground.png").convert_alpha()
+        """The 'free_sprite' list will contain all the tuples surfaces of the sprites on which the items to collect 
+        may blit. Not on the walls, the player, the keeper and a few positions too close to him."""
+        self.free_sprites = []
+        self.window = window
+
 
         """ This function read the datas in the 'structure.py' file and assign to each number an image (wall, ground 
           or start), and a surface position. """
 
-        num_line = 0
-        for line in open("structure.py"):
+        num_ligne = 0
+        for ligne in open("structure.py"):
             num_case = 0
-            for sprite in line:
+            for sprite in ligne:
                 x = num_case * sprite_size
-                y = num_line * sprite_size
-                if sprite == '1':
+                y = num_ligne * sprite_size
+                if sprite in ("0", "3"):
+                    position = (x, y)
+                    window.blit(ground, position)
+                    """All the free sprites tuples surfaces will be added to the list during this process."""
+                    if sprite == "0":
+                        self.free_sprites.append(position)
+                elif sprite == '1':
                     window.blit(wall, (x, y))
                 elif sprite == '2':
                     window.blit(start, (x, y))
-                elif sprite == '0' or '3':
-                    window.blit(ground, (x, y))
                 num_case += 1
-            num_line += 1
+            num_ligne += 1
 
+    """This function will permit to place the three items to collect randomly in the maze 
+    each tim the game will be open"""
+    def initialize_items(self):
+        self.needle = pygame.image.load("images/needle.png").convert_alpha()
+        self.ether = pygame.image.load("images/ether.png").convert_alpha()
+        self.tube = pygame.image.load("images/plastic_tube.png").convert_alpha()
+
+        for item in (self.tube, self.ether, self.needle):
+            """Each item takes a random position in the free_sprite list."""
+            position_idx = randrange(0, len(self.free_sprites) - 1)
+            """The position took by an item is removed from the list. 
+            That will avoid the next item to takes the same position.
+            We can use '.pop' or 'remove'"""
+            xy = self.free_sprites.pop(position_idx)
+            # self.free_sprites.remove(xy)
+            self.window.blit(item, xy)
+            self.item_references = {
+                xy: item
+            }
 
 class Player:
 
     """This class manage all the player attributes and functions."""
+
+    @property
+    def position(self):
+        return self.x, self.y,
 
     def __init__(self, icone, window):
         self.icone = pygame.image.load("images/MacGyver.png").convert_alpha()
@@ -67,28 +95,40 @@ class Player:
 
 class Keeper(Player):
 
-    """This descendant class manage only manage the keeper position in the maze. He may have be handled in the
+    """This descendant class only manage the keeper position in the maze. He may have be handled in the
     Labyrinth class. However this option could permit to work on a game enhancement or an add-on.
-    The keeper may get an agressive behaviour. Or for a multiplayer project."""
+    The keeper may get an aggressive behaviour. Or for a multi-player project."""
 
     def __init__(self, icone, window):
-        self.icone = pygame.image.load("images/Gardien.png").convert_alpha()
+        self.icone = pygame.image.load("images/keeper.png").convert_alpha()
         self.x = 700
         self.y = 700
 
-""" Main loop containing the game code. It allows to run the game as long as the player doesn't quit. """
+def main():
 
-continuer = 1
-while continuer:
-    for event in pygame.event.get():
-        if event.type == QUIT:
-            continuer = 0
+    pygame.init()
+    window = pygame.display.set_mode((window_width, window_height))
 
-        """ this line calls the labyrinth class which generates the maze. """
-        labyrinth = Labyrinth()
-        macgyver = Player("images/MacGyver.png", window)
-        keeper = Keeper("images/Gardien.png", window)
+    pygame.display.set_caption("FREE MACGYVER")
 
-        window.blit(macgyver.icone, (macgyver.x, macgyver.y))
-        window.blit(keeper.icone, (keeper.x, keeper.y))
+    maze = Labyrinth(window)
+    maze.initialize_items()
+    macgyver = Player("images/MacGyver.png", window)
+    keeper = Keeper("images/keeper.png", window)
+
+    """ Main loop containing the game code. It allows to run the game as long as the player doesn't quit. """
+    continuer = 1
+    while continuer:
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                continuer = 0
+
+
+        window.blit(macgyver.icone, macgyver.position)
+        window.blit(keeper.icone, keeper.position)
+
         pygame.display.flip()
+
+
+if __name__ == '__main__':
+    main()
