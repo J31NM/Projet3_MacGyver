@@ -13,7 +13,7 @@
 010110000111011
 010011110101333
 100000000001113
-
+b555esp
 
 """
 Maze Structure : 
@@ -28,5 +28,3 @@ _ 3 : forbidden sprites for the items positions, because they are too close to t
         Walls (1) and start position (2) are also denied to the items position.
         Those two values are linked to specific images. So i needed to get an new value no related to an image.
 """
-
-
