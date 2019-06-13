@@ -21,7 +21,6 @@ from pygame.locals import *
 from constants import *
 from random import randrange
 
-
 class ItemBase(object):
     """
     This class will allow to manage the all the items in the game.
@@ -63,23 +62,38 @@ class Maze:
         may blit. Not on the walls, the player, the keeper and a few positions too close to him."""
         self.free_sprites = []
 
+        """The 'inventory' list will contain the items picked up by the player.
+        This list will be used later to define if the player win or loose when he will meet the keeper.
+        If the list is full and contain three items he wins, otherwise he looses."""
+        self.inventory = []
+
+        """The 'item_references' dictionnary will contain the surfaces of each items.
+        We will use it to blit the right item in the inventory window."""
+        self.item_references = {}
+
+        """The 'inventory_position' list of tuples contain the three sprites surfaces where the items can blit 
+        after have been collected by the player, at the bottom of the window."""
+        self.inventory_position = [(50, 750), (100, 750), (150, 750)]
+
         self.needle = None
         self.ether = None
         self.tube = None
+        self.equal = None
         self.syringe = None
         self.ground = None
 
         self.initialize()
 
     def initialize(self):
+        self.initialize_textures()
         self.display_structure()
         self.initialize_items()
         self.display_items()
 
-
-    def display_items(self):
-        for item in (self.tube, self.ether, self.needle):
-            self.window.blit(item.icon, item.position)
+    def initialize_textures(self):
+        self.equal = pygame.image.load("images/equal.png").convert_alpha()
+        self.syringe = pygame.image.load("images/syringe.png").convert_alpha()
+        self.ground = pygame.image.load("images/ground.png").convert_alpha()
 
     """ This function read the datas in the 'structure.py' file and assign to each number an image (wall, ground 
         or start), and a surface position. """
@@ -87,6 +101,9 @@ class Maze:
         wall = pygame.image.load("images/wall.png").convert_alpha()
         start = pygame.image.load("images/start.png").convert_alpha()
         ground = pygame.image.load("images/ground.png").convert_alpha()
+        backpack = pygame.image.load("images/backpack.png").convert_alpha()
+        inventory = pygame.image.load("images/inventory.png").convert_alpha()
+        penny = pygame.image.load("images/penny.png").convert_alpha()
 
         line_num = 0
         for ligne in self.structure:
@@ -104,6 +121,12 @@ class Maze:
                     self.window.blit(wall, (x, y))
                 elif sprite == '2':
                     self.window.blit(start, (x, y))
+                elif sprite == 'b':
+                    self.window.blit(backpack, (x, y))
+                elif sprite == '5':
+                    self.window.blit(inventory, (x, y))
+                elif sprite == 'p':
+                    self.window.blit(penny, (x, y))
                 case_num += 1
             line_num += 1
 
@@ -126,6 +149,48 @@ class Maze:
         xy = self.free_sprites.pop(position_idx)
         self.needle = Item("images/needle.png", xy)
         self.item_references[xy] = self.needle
+
+    def display_items(self):
+        for item in (self.tube, self.ether, self.needle):
+            self.window.blit(item.icon, item.position)
+
+    """The 'manage_inventory' function manage the behaviour of each item when the player collect them.
+        A ground image appear in order to hide the item collected.
+        The item appear in the inventory.
+        If the three items are collected, an 'equal' sign and the syringe appear. Equal symbolize the assembly."""
+    def manage_inventory(self, xy):
+        self.counter = 0
+        item = self.item_references.pop(xy)
+        self.window.blit(self.ground, xy)
+
+        try:
+            item.position = self.inventory_position.pop(self.counter)
+            self.window.blit(item.icon, item.position)
+            if len(self.inventory) == 3:
+                self.window.blit(self.equal, (200, 750))
+                self.window.blit(self.syringe, (250, 750))
+        except IndexError:
+            pass
+
+        self.counter += 1
+
+    def is_sprite_item(self, xy):
+        return xy in self.item_references
+
+    """ This function will manage the messages for the player, indications, advices and victory or game over texts.
+        I choose to add the character of Penny who is Macgyver friend.
+        The messages will appear in the inventory line at the bottom of the window.
+    """
+    def initialize_text(self):
+        x = 400
+        y = 50
+        display_surface = pygame.display.set_mode((x, y))
+        font = pygame.font.Font('freesansbold.ttf', 10)
+        text = font.render('Run MG run', True, WHITE)
+        textRect = text.get_rect()
+        while True:
+            display_surface.fill(BLACK)
+            display_surface.blit(text, textRect)
 
 class Player:
     """This class manage all the player attributes and functions. His position and the movements."""
@@ -185,7 +250,17 @@ class Keeper(Player):
 
 def main():
     pygame.init()
+    """ Penny's messages attributes."""
+    myfont = pygame.font.SysFont('Comic Sans MS', 14)
+
     window = pygame.display.set_mode((window_width, window_height))
+
+    line_space = 20
+    x, y = (360, 750,)
+    for line in MESSAGES['Intro']:
+        line_surface = myfont.render(line, False, WHITE)
+        window.blit(line_surface, (x, y))
+        y += line_space
 
     pygame.display.set_caption("FREE MACGYVER")
 
@@ -201,14 +276,22 @@ def main():
             if event.type == QUIT:
                 continuer = 0
 
+            mac_pos = macgyver.position
+
             if event.type == KEYDOWN:
                 macgyver.move(event.key)
+
+            if maze.is_sprite_item(mac_pos):
+                item = maze.item_references[mac_pos]
+                maze.inventory.append(item)
+                maze.manage_inventory(mac_pos)
 
             maze.display_structure()
             maze.display_items()
 
-            window.blit(macgyver.icon, macgyver.position)
             window.blit(keeper.icon, keeper.position)
+            window.blit(macgyver.icon, macgyver.position)
+
 
             pygame.display.flip()
 
