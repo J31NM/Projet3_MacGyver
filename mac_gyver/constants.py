@@ -27,28 +27,23 @@ MESSAGES = {
     ],
     'first_item': [
         "You found something but that seems useless."
+        "keep searching."
     ],
     'second_item': [
         "Something else ! But still nothing interesting...",
-        "keep searching."
+        "Maybe if you assemble them... no"
+
     ],
     'syringe': [
         "Well done !! you build a drowsy syringe.",
         "You may have a chance against the keeper !"
     ],
-    'victory1': [
+    'victory': [
         "YOU MADE IT ! ",
-        "Come find me at the Phoenix foundation handsome ;)"
+        "Let's celebrate at the Phoenix Foundation !"
     ],
-    'victory2' : [
-        "Looking for Penny, Macgyver lost himself in the building",
-        "Let's free him in FREE MACGYVER II ! Coming soon !"
-    ],
-    'fail1': [
+    'fail': [
         "Oh noo... Too bad",
         "Your fists were not enough to beat the keeper."
     ],
-    'fail2': [
-        "MacGyver was brought in jail",
-        "Let's free him in FREE MACGYVER II ! Coming soon !"
-    ]}
+}
