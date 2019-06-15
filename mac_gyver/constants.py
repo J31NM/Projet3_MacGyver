@@ -19,14 +19,14 @@ sprite_size = 50
 window_height = sprites_height * sprite_size
 window_width = sprites_width * sprite_size
 
-# Texts for the player
+# Messages for the player
 MESSAGES = {
     'Intro': [
         "Try to find the exit, but be careful, the keeper ",
         "won't let you pass."
     ],
     'first_item': [
-        "You found something but that seems useless."
+        "You found something but that seems useless.",
         "keep searching."
     ],
     'second_item': [
@@ -43,7 +43,7 @@ MESSAGES = {
         "Let's celebrate at the Phoenix Foundation !"
     ],
     'fail': [
-        "Oh noo... Too bad",
+        "Oh noo... Too bad.... YOU LOOSE",
         "Your fists were not enough to beat the keeper."
     ],
 }
