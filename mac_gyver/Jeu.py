@@ -4,10 +4,11 @@
 """
 FREE MACGYVER
 
-Little game in witch the player embodies Macgyver who needs to escape from a maze after having incapacitated his keeper.
+Little game in witch the player embodies Macgyver who needs to escape from a maze
+after having incapacitated his keeper.
 In order to put him away, Macgyver has to sedate him with a tranquilizer into a syringe.
-Besides his unlimited engineering skills, Macgyver will needs three items randomly arranged in the maze to build the syringe:
-a needle, a bottle of ether and a plastic tube.
+Besides his unlimited engineering skills, Macgyver will needs three items
+randomly arranged in the maze to build the syringe: a needle, a bottle of ether and a plastic tube.
 The player fail if he finds the exit without the syringe.
 Only Macgyver can move, the keeper is immobile next to the exit.
 
@@ -15,20 +16,16 @@ Script Python
 Files : jeu.py, requirements.py, structure.py, constants.py + images
 """
 
+from random import randrange
 import pygame
 from pygame.locals import *
-
 from constants import *
-from random import randrange
 
+"""This class will allow to manage the all the items in the game."""
 class ItemBase(object):
-    """
-    This class will allow to manage the all the items in the game.
-    """
-
     @property
     def position(self):
-        return self.x, self.y,
+        return self.x, self.y
 
     @position.setter
     def position(self, position):
@@ -38,28 +35,26 @@ class ItemBase(object):
         self.icon = pygame.image.load(icon).convert_alpha()
         self.x, self.y = position
 
-    def display(self):
-        pass
 
 class Item(ItemBase):
-    """
-    Needle, plastic tube and ether
-    """
+    """Needle, plastic tube and ether"""
+
 
 class Maze:
-
-    """ This class manage all the non-player functions as generating the maze design and the items positions """
+    """ This class manage all the non-player functions as generating the maze design
+        and the items positions """
 
     def __init__(self, window):
         self.window = window
 
-        """We need to open the file 'structure.py' to build the maze, and close it after having read it in order to 
-        avoid keep it opened."""
+        """We need to open the file 'structure.py' to build the maze,
+        and close it after having read it in order to avoid keep it opened."""
         with open("structure.py") as fd:
             self.structure = fd.readlines()
 
-        """The 'free_sprite' list will contain all the tuples surfaces of the sprites on which the items to collect 
-        may blit. Not on the walls, the player, the keeper and a few positions too close to him."""
+        """The 'free_sprite' list will contain all the tuples surfaces of the sprites on which
+        the items to collect may blit. Not on the walls, the player, 
+        the keeper and a few positions too close to him."""
         self.free_sprites = []
 
         """The 'inventory' list will contain the items picked up by the player.
@@ -71,8 +66,8 @@ class Maze:
         We will use it to blit the right item in the inventory window."""
         self.item_references = {}
 
-        """The 'inventory_position' list of tuples contain the three sprites surfaces where the items can blit 
-        after have been collected by the player, at the bottom of the window."""
+        """The 'inventory_position' list of tuples contain the three sprites surfaces where the items
+        can blit after have been collected by the player, at the bottom of the window."""
         self.inventory_position = [(50, 750), (100, 750), (150, 750)]
 
         self.needle = None
@@ -95,8 +90,8 @@ class Maze:
         self.syringe = pygame.image.load("images/syringe.png").convert_alpha()
         self.ground = pygame.image.load("images/ground.png").convert_alpha()
 
-    """ This function read the datas in the 'structure.py' file and assign to each number an image (wall, ground 
-        or start), and a surface position. """
+    """ This function read the datas in the 'structure.py' file and assign to each number an image
+        (wall, ground or start), and a surface position. """
     def display_structure(self):
         wall = pygame.image.load("images/wall.png").convert_alpha()
         start = pygame.image.load("images/start.png").convert_alpha()
@@ -130,8 +125,8 @@ class Maze:
                 case_num += 1
             line_num += 1
 
-    """ This function assign a random position to each three items into the maze and takes care they will not pick up
-        the same adress twice."""
+    """ This function assign a random position to each three items into the maze
+        and takes care they will not pick up the same adress twice."""
     def initialize_items(self):
         self.item_references = {}
 
@@ -157,12 +152,12 @@ class Maze:
     """The 'manage_inventory' function manage the behaviour of each item when the player collect them.
         A ground image appear in order to hide the item collected.
         The item appear in the inventory.
-        If the three items are collected, an 'equal' sign and the syringe appear. Equal symbolize the assembly."""
+        If the three items are collected, an 'equal' sign and the syringe appear.
+        Equal symbolize the assembly."""
     def manage_inventory(self, xy):
         self.counter = 0
         item = self.item_references.pop(xy)
         self.window.blit(self.ground, xy)
-
         try:
             item.position = self.inventory_position.pop(self.counter)
             self.window.blit(item.icon, item.position)
@@ -171,18 +166,19 @@ class Maze:
                 self.window.blit(self.syringe, (250, 750))
         except IndexError:
             pass
-
         self.counter += 1
 
     def is_sprite_item(self, xy):
         return xy in self.item_references
 
-    """This property will be used to choose the right message for the player depending of how many items he has."""
+    """This property will be used to choose the right message for the player
+        depending of how many items he has."""
     @property
     def items_count(self):
         return len(self.inventory)
 
-    """ This function will manage the messages for the player, indications, advices and victory or game over texts.
+    """ This function will manage the messages for the player, indications,
+        advices and victory or game over texts.
         I choose to add the character of Penny who is Macgyver friend.
         The messages will appear in the inventory line at the bottom of the window.
     """
@@ -206,7 +202,6 @@ class Maze:
                 self.sentence = 'victory'
             else:
                 self.sentence = 'fail'
-
         line_space = 20
         x, y = (360, 750,)
         for line in MESSAGES[self.sentence]:
@@ -221,13 +216,13 @@ class Player:
     That will allow to control his position on the maze checkerboard and to interact with the items."""
     @property
     def position(self):
-        return self.x, self.y,
+        return self.x, self.y
 
     def __init__(self, icon, initial_position=None):
         """Be sure that the player will begin the game at the top left position."""
         initial_position = initial_position or (0, 0)
         self.icon = pygame.image.load(icon).convert_alpha()
-        """The cases correspond to the structure. 
+        """The cases correspond to the structure.
         Each move from the player will also be located in in the 'structure.py board."""
         self.case_x = 0
         self.case_y = 0
@@ -254,7 +249,8 @@ class Player:
                 if self.structure[self.case_y - 1][self.case_x] != '1':
                     self.case_y -= 1
         elif direction == K_DOWN:
-            """In this case we need to avoid to move the player in the inventory line. So -100 instead of -50 pixels"""
+            """In this case we need to avoid to move the player in the inventory line.
+                So -100 instead of -50 pixels"""
             if self.y < (window_height - 100):
                 if self.structure[self.case_y + 1][self.case_x] != '1':
                     self.case_y += 1
@@ -282,7 +278,8 @@ def main():
     """Allow the player to move faster if he keeps the button pushed."""
     pygame.key.set_repeat(400, 30)
 
-    """ Main loop containing the game code. It allows to run the game as long as the player doesn't quit. """
+    """ Main loop containing the game code.
+        It allows to run the game as long as the player doesn't quit. """
     continuer = 1
     while continuer:
         pygame.time.Clock().tick(30)
@@ -292,8 +289,8 @@ def main():
 
             mac_pos = macgyver.position
 
-            """This condition allow the player to move but stop the movement after having faced the keeper 
-            which induced the end of the game."""
+            """This condition allow the player to move but stop the movement after having faced the keeper
+                which induced the end of the game."""
             if event.type == KEYDOWN and mac_pos != (700, 700):
                 macgyver.move(event.key)
 
