@@ -177,20 +177,42 @@ class Maze:
     def is_sprite_item(self, xy):
         return xy in self.item_references
 
+    """This property will be used to choose the right message for the player depending of how many items he has."""
+    @property
+    def items_count(self):
+        return len(self.inventory)
+
     """ This function will manage the messages for the player, indications, advices and victory or game over texts.
         I choose to add the character of Penny who is Macgyver friend.
         The messages will appear in the inventory line at the bottom of the window.
     """
-    def initialize_text(self):
-        x = 400
-        y = 50
-        display_surface = pygame.display.set_mode((x, y))
-        font = pygame.font.Font('freesansbold.ttf', 10)
-        text = font.render('Run MG run', True, WHITE)
-        textRect = text.get_rect()
-        while True:
-            display_surface.fill(BLACK)
-            display_surface.blit(text, textRect)
+    def choose_text(self, xy):
+        myfont = pygame.font.SysFont('Comic Sans MS', 14)
+        items_count = self.items_count
+        """They are two options for the messages.
+            In the first one the player is in the maze and continue to play.
+            If the player go on the keeper sprite, he activate the final message, victory or fail."""
+        if xy != (700, 700,):
+            if items_count == 0:
+                self.sentence = 'Intro'
+            elif items_count == 1:
+                self.sentence = 'first_item'
+            elif items_count == 2:
+                self.sentence = 'second_item'
+            elif items_count == 3:
+                self.sentence = 'syringe'
+        else:
+            if items_count == 3:
+                self.sentence = 'victory'
+            else:
+                self.sentence = 'fail'
+
+        line_space = 20
+        x, y = (360, 750,)
+        for line in MESSAGES[self.sentence]:
+            line_surface = myfont.render(line, False, WHITE)
+            self.window.blit(line_surface, (x, y))
+            y += line_space
 
 class Player:
     """This class manage all the player attributes and functions. His position and the movements."""
@@ -250,23 +272,15 @@ class Keeper(Player):
 
 def main():
     pygame.init()
-    """ Penny's messages attributes."""
-    myfont = pygame.font.SysFont('Comic Sans MS', 14)
-
     window = pygame.display.set_mode((window_width, window_height))
-
-    line_space = 20
-    x, y = (360, 750,)
-    for line in MESSAGES['Intro']:
-        line_surface = myfont.render(line, False, WHITE)
-        window.blit(line_surface, (x, y))
-        y += line_space
-
     pygame.display.set_caption("FREE MACGYVER")
 
     maze = Maze(window)
     macgyver = Player("images/MacGyver.png")
     keeper = Keeper("images/keeper.png", initial_position=(700, 700))
+
+    """Allow the player to move faster if he keeps the button pushed."""
+    pygame.key.set_repeat(400, 30)
 
     """ Main loop containing the game code. It allows to run the game as long as the player doesn't quit. """
     continuer = 1
@@ -278,7 +292,9 @@ def main():
 
             mac_pos = macgyver.position
 
-            if event.type == KEYDOWN:
+            """This condition allow the player to move but stop the movement after having faced the keeper 
+            which induced the end of the game."""
+            if event.type == KEYDOWN and mac_pos != (700, 700):
                 macgyver.move(event.key)
 
             if maze.is_sprite_item(mac_pos):
@@ -288,10 +304,10 @@ def main():
 
             maze.display_structure()
             maze.display_items()
+            maze.choose_text(mac_pos)
 
             window.blit(keeper.icon, keeper.position)
             window.blit(macgyver.icon, macgyver.position)
-
 
             pygame.display.flip()
 
