@@ -13,18 +13,26 @@
 010110000111011
 010011110101333
 100000000001113
-b555esp55555555
+b444esp44444444
 
 """
 Maze Structure : 
 Each number in this structure represents a sprite in the game.
-they are 15 columns and 15 lines.
-Each will be convert to a surface and replaced by an image in the Labyrinth Class to draw the maze level.
-They are four values :
-_ 0, 2, 3 : represents the path on witch Macgyver can walk.
+they are 15 columns and 16 lines.
+Each will be convert to a surface and replaced by an image in the Labyrinth Class 
+to draw the maze level.
+They are nine values :
+_ 0, 2, 3 : represents the path on witch Macgyver can walk
 _ 1 : walls
 _ 2 : Start position which represent a Checkboard
 _ 3 : forbidden sprites for the items positions, because they are too close to the keeper.
         Walls (1) and start position (2) are also denied to the items position.
-        Those two values are linked to specific images. So i needed to get an new value no related to an image.
+        Those two values are linked to specific images. 
+        So i needed to get an new value no related to an image.
+_ 4 : Black sprites for the inventory bar. The three on the left are the emplacements for the items.
+        The eight on the right are for the messages.
+_ b : Macgyver Backpack icon.
+_ e : Equal symbol icon
+_ s : Syringe icon
+_ p : Penny icon
 """
