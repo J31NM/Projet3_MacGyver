@@ -8,10 +8,6 @@ BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 BLUE = (0, 0, 255)
 
-# Screen dimensions
-SCREEN_WIDTH = 750
-SCREEN_HEIGHT = 800
-
 # Sprites attributes
 sprites_height = 16
 sprites_width = 15
