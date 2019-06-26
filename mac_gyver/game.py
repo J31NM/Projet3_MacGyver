@@ -121,9 +121,9 @@ class Maze:
             case_num = 0
             for sprite in line.strip():
                 # pylint: disable=C0103
-                x = case_num * sprite_size
+                x = case_num * SPRITE_SIZE
                 # pylint: disable=C0103
-                y = line_num * sprite_size
+                y = line_num * SPRITE_SIZE
                 if sprite in ("0", "3"):
                     position = (x, y)
                     self.window.blit(ground, position)
@@ -266,7 +266,7 @@ class Player:
         """Function that allow the player to move"""
         if direction == pygame_locals.K_RIGHT:
             # Check if we are against the window frame before to allow the move.
-            if self.x < (window_width - 50):
+            if self.x < (WINDOW_WIDTH - 50):
                 # Check if the next sprite is a wall or a ground before to allow the move.
                 if self.structure[self.case_y][self.case_x + 1] != '1':
                     # Update the position in the structure grid.
@@ -282,12 +282,12 @@ class Player:
         elif direction == pygame_locals.K_DOWN:
             # In this case we need to avoid to move the player in the inventory line.
             # So -100 instead of -50 pixels
-            if self.y < (window_height - 100):
+            if self.y < (WINDOW_HEIGHT - 100):
                 if self.structure[self.case_y + 1][self.case_x] != '1':
                     self.case_y += 1
 
-        self.x = self.case_x * sprite_size
-        self.y = self.case_y * sprite_size
+        self.x = self.case_x * SPRITE_SIZE
+        self.y = self.case_y * SPRITE_SIZE
 
 
 class Keeper(Player):
@@ -301,7 +301,7 @@ class Keeper(Player):
 def main():
     """Main loop for the game"""
     pygame.init()
-    window = pygame.display.set_mode((window_width, window_height))
+    window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
     pygame.display.set_caption("FREE MACGYVER")
 
     maze = Maze(window)

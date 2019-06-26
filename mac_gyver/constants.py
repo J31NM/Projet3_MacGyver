@@ -9,11 +9,11 @@ WHITE = (255, 255, 255)
 BLUE = (0, 0, 255)
 
 # Sprites attributes
-sprites_height = 16
-sprites_width = 15
-sprite_size = 50
-window_height = sprites_height * sprite_size
-window_width = sprites_width * sprite_size
+SPRITES_HEIGHT = 16
+SPRITES_WIDTH = 15
+SPRITE_SIZE = 50
+WINDOW_HEIGHT = SPRITES_HEIGHT * SPRITE_SIZE
+WINDOW_WIDTH = SPRITES_WIDTH * SPRITE_SIZE
 
 # Messages for the player
 MESSAGES = {
