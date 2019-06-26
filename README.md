@@ -1,2 +1,3 @@
-# Projet3_MacGyver
-Créer un petit jeu de labyrinthe avec PyGame dont MacGyver est le héros
+# Project3_MacGyver
+Build a small maze game with Pygame in which Macgyver is the hero
+
